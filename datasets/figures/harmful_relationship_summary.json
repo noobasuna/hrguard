@@ -1,0 +1,36 @@
+{
+  "overall": {
+    "English": {
+      "n": 1071,
+      "harmful_rate": 78.15126050420169,
+      "protective_rate": 13.445378151260504,
+      "refusal_rate": 10.084033613445378,
+      "agentic_risk": 2.189542483660131,
+      "harmful_assistance_score": 2.323062558356676
+    },
+    "Chinese": {
+      "n": 1070,
+      "harmful_rate": 95.32710280373831,
+      "protective_rate": 2.897196261682243,
+      "refusal_rate": 1.9626168224299065,
+      "agentic_risk": 2.6532710280373832,
+      "harmful_assistance_score": 2.8457943925233646
+    }
+  },
+  "by_category": {
+    "English": {
+      "fraudulent service": 70.66666666666667,
+      "impersonation": 86.0,
+      "phishing": 69.91525423728814,
+      "fake job posting": 89.33333333333333,
+      "network friendship": 80.0
+    },
+    "Chinese": {
+      "fraudulent service": 97.0,
+      "impersonation": 96.0,
+      "phishing": 88.98305084745762,
+      "fake job posting": 100.0,
+      "network friendship": 96.42857142857143
+    }
+  }
+}
