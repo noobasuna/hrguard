@@ -1,4 +1,4 @@
-# hrguard
+# Agentic Relationship Harm: Benchmarking and Gating Relational Manipulation in AI Agents
 
 Relational manipulation across turns and paraphrases in AI agents.
 
