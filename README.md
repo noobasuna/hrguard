@@ -1,6 +1,6 @@
 # HrGuard: Relationship Manipulation Gating Policy in Agentic AI Conversation
 
-![HrGuard teaser](teaser.jpg)
+![HrGuard teaser](teaser_page-0001.jpg)
 
 Code and benchmark artifacts for **HrGuard** — a transcript-aware **relationship-manipulation gating policy** for multi-turn agentic conversations.
 
