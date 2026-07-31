@@ -1,0 +1,41 @@
+# Secrets / credentials
+.env
+.env.*
+gateaway.txt
+**/credentials*
+**/*api_key*
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+
+# Local / cluster clutter
+logs/
+openclaw-tsubame-home/
+vllmlog.txt
+Untitled
+*.bak
+*.bak.*
+
+# Large run artifacts (do not put judged generations in git)
+results/judge-pipeline/
+results/advparaphrase-analysis/
+*.xlsx
+
+# Large generation dumps at repo root
+openclaw_multiturn_*.jsonl
+*_gateway_sequential.jsonl
+*_cumulative_gated_stopped*.jsonl
+*_final_judged_*.jsonl
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Optional: keep paper figures only under results/figures; ignore heavy bootstrap dumps
+results/figures/bootstrap_data/

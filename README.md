@@ -1,84 +1,118 @@
-# Agentic Relationship Harm: Benchmarking and Gating Relational Manipulation in AI Agents
+# HrGuard: Relationship Manipulation Gating Policy in Agentic AI Conversation
 
-Relational manipulation across turns and paraphrases in AI agents.
+Code and benchmark artifacts for **HrGuard** — a transcript-aware **relationship-manipulation gating policy** for multi-turn agentic conversations.
 
-![hrguard teaser](teaser.jpg)
+HrGuard monitors evolving attacker/victim dialogs and intervenes with a shared cumulative risk score via:
 
-`hrguard` contains the benchmark, generation scripts, analysis code, and supporting assets for evaluating whether an agent can distinguish harmful relationship-manipulation requests from protective victim-side requests.
+- **Pregate** (online, before generation)
+- **Postgate** (offline, after generation; stop-after-trigger)
 
-## What is included
+Primary evaluation uses role-conditioned metrics under a GPT-4o-mini outcome judge:
+attacker harmful compliance \(\mathrm{H_A}\) ↓ and victim protective intervention \(\mathrm{P_V}\) ↑.
 
-The repository currently keeps the project content under `datasets/`:
+> This repository is scoped to the **Relationship Manipulation Gating** paper contribution only.
+> Unrelated fraud-benchmark / attack-toolkit material is not part of this release.
 
-- benchmark construction scripts
-- multi-turn prompt generation scripts
-- adversarial paraphrase generation scripts
-- judge and gate application scripts
-- benchmark analysis and plotting scripts
-- benchmark datasets in JSONL / JSON format
-- figures and assets used in the paper
+## Repository contents
 
-## Main benchmark sets
+| Path | Role |
+|---|---|
+| `apply_cumulative_relationship_gate.py` | Core Postgate / cumulative relationship gate |
+| `romance_scam_judge.py` | Outcome / turn judge (OpenAI / local) |
+| `openai_batch_judge.py` | OpenAI Batch API wrapper for the same judge |
+| `make_turn_level_judge_inputs.py` | Expand sequential dialogs into per-turn judge rows |
+| `openclaw_generate_sequential.py` | Multi-turn Raw / GS generation |
+| `openclaw_generate_real_sequential_pregated.py` | Multi-turn Pregate generation |
+| `datasets/dataset/openclaw_multiturn_level4plus_current_advpara.jsonl` | Main 1000-dialog benchmark (500 attacker / 500 victim) |
+| `datasets/apply_relationship_gate.py` | Lightweight gate helper used in analysis |
+| `datasets/apply_*_baseline.py` | Industry-guard baselines (LlamaGuard / ShieldGemma / Qwen3Guard) |
+| `datasets/requirement.txt` | Python dependencies |
 
-- `datasets/dataset/openclaw_structured_1100.jsonl`: main 1100-prompt structured benchmark
-- `datasets/dataset/openclaw_structured_1100_current.jsonl`: current-version prompt set
-- `datasets/dataset/openclaw_structured_1100_adversarial_paraphrased.jsonl`: adversarially paraphrased variant
-- `datasets/dataset/openclaw_multiturn_level4plus_current_advpara.jsonl`: 1000-item multi-turn benchmark
-- `datasets/dataset/multiturn_40_prompts.jsonl`: 40-case multi-turn stress test
-- `datasets/dataset/vulnerability_profiled_victim_12.jsonl`: vulnerability-profiled victim slice
-- `datasets/dataset/benign_relationship_control_30.jsonl`: benign control set
+## Pipeline
 
-## Key scripts
+```text
+benchmark JSONL
+    → sequential generation (Raw / GS / Pregate)
+    → turn-level judge
+    → cumulative relationship gate (Postgate)
+    → final outcome judge
+    → H / P / R and H_A / P_V
+```
 
-- `datasets/openclaw_generate_real.py`: run OpenClaw-generated outputs through a gateway or local agent
-- `datasets/openclaw_judge_batch.py`: judge batches of outputs
-- `datasets/apply_relationship_gate.py`: apply the relationship-specific gate
-- `datasets/make_openclaw_multiturn_level4plus.py`: build the level-4-plus multi-turn set
-- `datasets/make_openclaw_adversarial_paraphrase_benchmark.py`: build paraphrased benchmark variants
-- `datasets/plot_relationship_harm_results.py`: plot the main relationship-harm results
-- `datasets/make_fraudr1_robustness_*`: construct Fraud-R1 robustness figures and summaries
+### 1. Turn judge inputs
+
+```bash
+python make_turn_level_judge_inputs.py \
+  --input path/to/sequential.jsonl \
+  --output path/to/turn_judge_inputs.jsonl
+```
+
+### 2. Judge turns
+
+```bash
+python romance_scam_judge.py \
+  --transport openai \
+  --model gpt-4o-mini \
+  --input path/to/turn_judge_inputs.jsonl \
+  --output path/to/turn_judged.jsonl
+```
+
+### 3. Apply Postgate
+
+```bash
+python apply_cumulative_relationship_gate.py \
+  --raw path/to/sequential.jsonl \
+  --judged path/to/turn_judged.jsonl \
+  --output path/to/cumulative_gated_stopped.jsonl \
+  --require-judged-turns \
+  --turn-threshold 5.0 \
+  --cumulative-threshold 6.0 \
+  --decay 0.85 \
+  --stop-after-trigger
+```
+
+Default gate policy (paper main setting):
+
+- turn threshold \(\tau_{\mathrm{turn}} = 5\)
+- cumulative threshold \(\tau_{\mathrm{cum}} = 6\)
+- decay \(\lambda = 0.85\)
+- **oracle-role**: victim-mode dialogs bypass the gate unless `--ignore-mode-label`
+
+### 4. Final judge on gated transcripts
+
+**Important:** for gated rows, judge the gated `final_response` (refusal), not `raw_final_response`.
+
+```bash
+python romance_scam_judge.py \
+  --transport openai \
+  --model gpt-4o-mini \
+  --input path/to/cumulative_gated_stopped.jsonl \
+  --output path/to/final_judged.jsonl
+```
 
 ## Environment
 
-The code was developed with Python 3.10+. For the benchmark scripts:
+Python 3.10+ recommended:
 
 ```bash
 pip install -r datasets/requirement.txt
 ```
 
-The OpenClaw-based runs also depend on a working OpenClaw installation and a reachable model backend, such as a local Ollama server.
+OpenClaw (or another OpenAI-compatible generator backend) is required for multi-turn generation.
+Set `OPENAI_API_KEY` when using `--transport openai`.
 
-## Running generation
+## Ethics
 
-Example gateway-based run:
+This project contains **relationship-manipulation evaluation prompts** for research only.
+Do not use the benchmark to build or deploy manipulative agents.
+Released artifacts separate prompt construction, generation, judgment, and gating so defenses can be audited independently.
 
-```bash
-python datasets/openclaw_generate_real.py \
-  --input datasets/dataset/openclaw_multiturn_level4plus_current_advpara.jsonl \
-  --output datasets/results/openclaw_multiturn_level4plus_current_advpara_ollama_gateway.jsonl \
-  --transport gateway \
-  --model ollama/llama3.2 \
-  --condition multiturn-level4plus-current-advpara \
-  --batch-size 3 \
-  --batch-sleep-seconds 300 \
-  --item-sleep-seconds 15 \
-  --pre-row-sleep-seconds 15 \
-  --resume
-```
+## Citation
 
-## Running judgment and analysis
+If you use this repository, please cite the paper:
 
-Typical workflow:
+**Relationship Manipulation Gating Policy in Agentic AI Conversation** (HrGuard).
 
-1. generate model outputs
-2. judge the outputs with the separate judge pipeline
-3. apply the relationship gate
-4. summarize or plot the results
+## License
 
-The exact command depends on the target condition, but the repository includes the scripts needed for each stage.
-
-## Notes
-
-- This repository intentionally separates prompt construction, generation, judgment, and plotting.
-- Generated outputs in `datasets/results/` should generally be treated as run artifacts rather than source data.
-- The project includes harmful content for research and evaluation purposes only.
+MIT — see `LICENSE`.
