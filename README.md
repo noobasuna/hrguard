@@ -10,7 +10,7 @@ HrGuard monitors evolving attacker/victim dialogs and intervenes with a shared c
 - **Postgate** (offline, after generation; stop-after-trigger)
 
 Primary evaluation uses role-conditioned metrics under a GPT-4o-mini outcome judge:
-attacker harmful compliance \(\mathrm{H_A}\) ↓ and victim protective intervention \(\mathrm{P_V}\) ↑.
+attacker harmful compliance ↓ and victim protective intervention ↑.
 
 > This repository is scoped to the **Relationship Manipulation Gating** paper contribution only.
 > Unrelated fraud-benchmark / attack-toolkit material is not part of this release.
