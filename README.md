@@ -20,7 +20,7 @@ attacker harmful compliance ↓ and victim protective intervention ↑.
 | Path | Role |
 |---|---|
 | `apply_cumulative_relationship_gate.py` | Core Postgate / cumulative relationship gate |
-| `romance_scam_judge.py` | Outcome / turn judge (OpenAI / local) |
+| `main_judge.py` | Outcome / turn judge (OpenAI / local) |
 | `openai_batch_judge.py` | OpenAI Batch API wrapper for the same judge |
 | `make_turn_level_judge_inputs.py` | Expand sequential dialogs into per-turn judge rows |
 | `openclaw_generate_sequential.py` | Multi-turn Raw / GS generation |
@@ -52,7 +52,7 @@ python make_turn_level_judge_inputs.py \
 ### 2. Judge turns
 
 ```bash
-python romance_scam_judge.py \
+python main_judge.py \
   --transport openai \
   --model gpt-4o-mini \
   --input path/to/turn_judge_inputs.jsonl \
@@ -75,9 +75,10 @@ python apply_cumulative_relationship_gate.py \
 
 Default gate policy (paper main setting):
 
-- turn threshold \(\tau_{\mathrm{turn}} = 5\)
-- cumulative threshold \(\tau_{\mathrm{cum}} = 6\)
-- decay \(\lambda = 0.85\)
+- Turn threshold: τ_turn=5
+- Cumulative threshold: τ_cum=6
+- Decay factor: λ=0.85
+
 - **oracle-role**: victim-mode dialogs bypass the gate unless `--ignore-mode-label`
 
 ### 4. Final judge on gated transcripts
@@ -85,7 +86,7 @@ Default gate policy (paper main setting):
 **Important:** for gated rows, judge the gated `final_response` (refusal), not `raw_final_response`.
 
 ```bash
-python romance_scam_judge.py \
+python main_judge.py \
   --transport openai \
   --model gpt-4o-mini \
   --input path/to/cumulative_gated_stopped.jsonl \
