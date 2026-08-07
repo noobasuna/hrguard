@@ -25,10 +25,10 @@ attacker harmful compliance ↓ and victim protective intervention ↑.
 | `make_turn_level_judge_inputs.py` | Expand sequential dialogs into per-turn judge rows |
 | `openclaw_generate_sequential.py` | Multi-turn Raw / GS generation |
 | `openclaw_generate_real_sequential_pregated.py` | Multi-turn Pregate generation |
-| `datasets/dataset/openclaw_multiturn_level4plus_current_advpara.jsonl` | Main 1000-dialog benchmark (500 attacker / 500 victim) |
-| `datasets/apply_relationship_gate.py` | Lightweight gate helper used in analysis |
-| `datasets/apply_*_baseline.py` | Industry-guard baselines (LlamaGuard / ShieldGemma / Qwen3Guard) |
-| `datasets/requirement.txt` | Python dependencies |
+| `dataset/openclaw_multiturn_level4plus_current_advpara.jsonl` | Main 1000-dialog benchmark (500 attacker / 500 victim) |
+| `apply_relationship_gate.py` | Lightweight gate helper used in analysis |
+| `apply_*_baseline.py` | Industry-guard baselines (LlamaGuard / ShieldGemma / Qwen3Guard) |
+| `requirement.txt` | Python dependencies |
 
 ## Pipeline
 
@@ -98,7 +98,7 @@ python main_judge.py \
 Python 3.10+ recommended:
 
 ```bash
-pip install -r datasets/requirement.txt
+pip install -r requirement.txt
 ```
 
 OpenClaw (or another OpenAI-compatible generator backend) is required for multi-turn generation.
