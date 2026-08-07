@@ -110,12 +110,6 @@ This project contains **relationship-manipulation evaluation prompts** for resea
 Do not use the benchmark to build or deploy manipulative agents.
 Released artifacts separate prompt construction, generation, judgment, and gating so defenses can be audited independently.
 
-## Citation
-
-If you use this repository, please cite the paper:
-
-**Relationship Manipulation Gating Policy in Agentic AI Conversation** (HrGuard).
-
 ## License
 
 MIT — see `LICENSE`.
